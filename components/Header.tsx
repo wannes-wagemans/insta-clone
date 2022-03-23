@@ -8,15 +8,46 @@ import {
   MenuIcon,
 } from '@heroicons/react/outline'
 import { HomeIcon } from '@heroicons/react/solid'
+import { signIn, signOut, useSession } from 'next-auth/react'
+import { useRouter } from 'next/router'
+import { useDispatch, useSelector } from 'react-redux'
+import { setOpen } from '../features/openSlicer'
 
-export const Header: React.FC = () => {
+export const Header = () => {
+  const open = useSelector((state: any) => state.open.value)
+  const dispatch = useDispatch()
+
+  const { data: session } = useSession()
+  const router = useRouter()
+
+  const signInHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault()
+    signIn()
+  }
+  const signOutHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault()
+    signOut()
+  }
+
+  const addNewPost = () => {
+    dispatch(setOpen())
+  }
+
+  console.log(open)
+
   return (
     <div className="sticky top-0 z-50 border-b bg-white shadow-sm ">
       <div className="mx-5 flex max-w-6xl justify-between lg:mx-auto">
-        <div className="relative hidden w-24 cursor-pointer lg:inline-grid">
+        <div
+          onClick={() => router.push('/')}
+          className="relative hidden w-24 cursor-pointer lg:inline-grid"
+        >
           <Image src="/logo.png" layout="fill" objectFit="contain" />
         </div>
-        <div className="relative w-10 flex-shrink-0 cursor-pointer lg:hidden">
+        <div
+          onClick={() => router.push('/')}
+          className="relative w-10 flex-shrink-0 cursor-pointer lg:hidden"
+        >
           <Image src="/logo-mobile.png" layout="fill" objectFit="contain" />
         </div>
 
@@ -34,21 +65,33 @@ export const Header: React.FC = () => {
         </div>
         <div className="flex items-center justify-end space-x-4">
           <MenuIcon className="h-6 cursor-pointer md:hidden" />
-          <HomeIcon className="navButton" />
-          <div className="navBtn relative ">
-            <PaperAirplaneIcon className="navButton rotate-45" />
-            <div className="absolute -top-1 -right-2 hidden h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white md:flex">
-              3
-            </div>
-          </div>
-          <PlusCircleIcon className="navButton" />
-          <UserGroupIcon className="navButton" />
-          <HeartIcon className="navButton" />
-          <img
-            src="/logo-mobile.png"
-            alt="profile pic"
-            className="h-10 cursor-pointer rounded-full"
-          />
+          <HomeIcon onClick={() => router.push('/')} className="navButton" />
+
+          {session ? (
+            <>
+              {' '}
+              <div className="navBtn relative ">
+                <PaperAirplaneIcon className="navButton rotate-45" />
+                <div className="absolute -top-1 -right-2 hidden h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white md:flex">
+                  3
+                </div>
+              </div>
+              <PlusCircleIcon onClick={addNewPost} className="navButton" />
+              <UserGroupIcon className="navButton" />
+              <HeartIcon className="navButton" />
+              <button onClick={signOutHandler}>
+                <img
+                  src={session?.user?.image}
+                  alt="profile pic"
+                  className="h-10 w-10 cursor-pointer rounded-full"
+                />
+              </button>
+            </>
+          ) : (
+            <button className="text-sm text-blue-400" onClick={signInHandler}>
+              SIGN IN
+            </button>
+          )}
         </div>
       </div>
     </div>

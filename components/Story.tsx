@@ -1,8 +1,8 @@
 import React from 'react'
 
 interface StoryProps {
-  username: 'string'
-  img: 'string'
+  username: string
+  img: string
 }
 
 export const Story: React.FC<StoryProps> = ({ img, username }) => {
